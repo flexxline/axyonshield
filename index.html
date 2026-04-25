@@ -1,0 +1,3021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>AxyonShield</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Condiment&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --background: #010828;
+      --cream: #EFF4FF;
+      --neon: #6FFF00;
+      --muted: rgba(239,244,255,0.7);
+      --glass: rgba(255,255,255,0.01);
+      --purple: #7c3aed;
+      --pink: #b724ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--cream);
+      overflow-x: hidden;
+      font-family: monospace;
+    }
+
+    body.no-scroll {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    input,
+    select,
+    textarea {
+      outline: none;
+    }
+
+    .font-grotesk {
+      font-family: "Anton", sans-serif;
+    }
+
+    .font-condiment {
+      font-family: "Condiment", cursive;
+    }
+
+    .liquid-glass {
+      background: rgba(255, 255, 255, 0.01);
+      background-blend-mode: luminosity;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: none;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .liquid-glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.4px;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.45) 0%,
+        rgba(255,255,255,0.15) 20%,
+        rgba(255,255,255,0) 40%,
+        rgba(255,255,255,0) 60%,
+        rgba(255,255,255,0.15) 80%,
+        rgba(255,255,255,0.45) 100%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .texture-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      background-image: url("/texture.png");
+      background-size: cover;
+      background-position: center;
+      opacity: 0.6;
+      mix-blend-mode: lighten;
+    }
+
+    .page {
+      display: none;
+      min-height: 100vh;
+      animation: pageEnter 0.7s ease both;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .animate-fade-up {
+      opacity: 0;
+      animation: fadeUp 0.9s ease both;
+    }
+
+    .hero-accent {
+      animation: floatText 4.5s ease-in-out infinite alternate;
+    }
+
+    .service-card {
+      animation: popIn 0.8s ease both;
+    }
+
+    .final-text {
+      animation: fadeUp 0.9s ease both;
+    }
+
+    .page-hero-label,
+    .page-title,
+    .about-heading,
+    .collection-title,
+    .hero-title {
+      opacity: 0;
+      animation: fadeUp 0.9s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes floatText {
+      from {
+        transform: translateY(0) rotate(-1deg);
+      }
+
+      to {
+        transform: translateY(-12px) rotate(-1deg);
+      }
+    }
+
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+        filter: blur(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1831px;
+      margin: 0 auto;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .section-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .header-global {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .header-inner {
+      position: relative;
+      max-width: 1831px;
+      margin: 0 auto;
+      padding: 28px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    .logo {
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+
+    .lang-selector {
+      position: absolute;
+      left: 50%;
+      top: 22px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 110;
+      min-width: 160px;
+      padding: 10px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    .lang-toggle {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--cream);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid rgba(111, 255, 0, 0.18);
+      transition: transform 0.25s ease, border-color 0.25s ease;
+      transform: translateY(0);
+    }
+
+    .lang-toggle:hover {
+      transform: translateY(-2px);
+      border-color: rgba(111, 255, 0, 0.35);
+    }
+
+    .lang-menu {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px 0 0;
+    }
+
+    .lang-menu.open {
+      display: flex;
+      animation: fadeDown 0.3s ease both;
+    }
+
+    .lang-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 12px 16px;
+      border-radius: 18px;
+      color: var(--cream);
+      background: rgba(255, 255, 255, 0.04);
+      transition: background 0.25s ease, transform 0.25s ease;
+      border: 1px solid transparent;
+      transform: translateX(0);
+    }
+
+    .lang-option:hover,
+    .lang-option.active {
+      background: rgba(111, 255, 0, 0.14);
+      border-color: rgba(111, 255, 0, 0.24);
+      transform: translateX(2px);
+    }
+
+    .mobile-lang-picker {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+      justify-content: center;
+    }
+
+    .mobile-lang-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--cream);
+      border: 1px solid rgba(111, 255, 0, 0.12);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: transform 0.2s ease, border-color 0.25s ease;
+      transform: translateY(0);
+    }
+
+    .mobile-lang-btn.active,
+    .mobile-lang-btn:hover {
+      border-color: rgba(111, 255, 0, 0.24);
+      transform: translateY(-2px);
+      background: rgba(111, 255, 0, 0.12);
+    }
+
+    .nav {
+      display: none;
+      border-radius: 28px;
+      padding: 24px 52px;
+      transition: transform 0.25s ease;
+      transform: translateY(0);
+    }
+
+    .nav:hover {
+      transform: translateY(-2px);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 46px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-link {
+      position: relative;
+      transition: color 0.25s ease, transform 0.25s ease;
+      transform: translateY(0);
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -8px;
+      width: 0%;
+      height: 2px;
+      background: var(--neon);
+      transition: width 0.25s ease;
+    }
+
+    .nav-link:hover,
+    .nav-link.active-link {
+      color: var(--neon);
+      transform: translateY(-2px);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active-link::after {
+      width: 100%;
+    }
+
+    .mobile-menu-btn {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+    }
+
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      background: rgba(1, 8, 40, 0.82);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .mobile-menu.open {
+      display: flex;
+      animation: fadeIn 0.35s ease both;
+    }
+
+    .mobile-menu-box {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 32px;
+      padding: 34px;
+      transition: transform 0.25s ease;
+      transform: translateY(0);
+    }
+
+    .mobile-menu-box:hover {
+      transform: translateY(-4px);
+    }
+
+    .mobile-menu-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 42px;
+    }
+
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      font-size: 42px;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .mobile-menu-links a {
+      transition: transform 0.25s ease;
+      transform: translateY(0);
+    }
+
+    .mobile-menu-links a:hover {
+      transform: translateY(-4px);
+    }
+
+    .mobile-close {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: 104px;
+    }
+
+    .hero-content {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-title-wrap {
+      position: relative;
+      max-width: 780px;
+    }
+
+    .hero-title {
+      font-size: 40px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .hero-accent {
+      position: absolute;
+      right: 0;
+      top: 45%;
+      transform: rotate(-1deg);
+      font-size: 24px;
+      color: var(--neon);
+      opacity: 0.9;
+      mix-blend-mode: exclusion;
+      white-space: nowrap;
+      font-weight: 400;
+    }
+
+    .desktop-social {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mobile-social {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .social-btn {
+      width: 56px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      border-radius: 1rem;
+      transition: background 0.25s ease, transform 0.25s ease;
+      transform: translateY(0);
+    }
+
+    .social-btn:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-3px);
+    }
+
+    .social-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+
+    .about {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .about-inner {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      padding-top: 64px;
+      padding-bottom: 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .about-top {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      justify-content: space-between;
+    }
+
+    .about-heading-wrap {
+      position: relative;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .about-heading {
+      font-size: 32px;
+      line-height: 1;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .about-accent {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      transform: rotate(-1deg);
+      color: var(--neon);
+      font-size: 36px;
+      mix-blend-mode: exclusion;
+      font-weight: 400;
+    }
+
+    .about-description {
+      max-width: 266px;
+      font-size: 14px;
+      line-height: 1.7;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+
+    .about-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 40px;
+      font-size: 14px;
+      line-height: 1.7;
+      text-transform: uppercase;
+      color: #010828;
+    }
+
+    .about-col {
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .about-col-right {
+      display: none;
+    }
+
+    .collection {
+      background: var(--background);
+      padding: 80px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .collection::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(111,255,0,0.12), transparent 26%),
+        radial-gradient(circle at 90% 40%, rgba(124,58,237,0.18), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(183,36,255,0.12), transparent 28%);
+      pointer-events: none;
+    }
+
+    .collection-header {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: 56px;
+    }
+
+    .collection-title {
+      font-size: 32px;
+      line-height: 1;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .collection-line-two {
+      display: inline-block;
+      margin-left: 48px;
+    }
+
+    .collection-digital {
+      font-family: "Condiment", cursive;
+      color: var(--neon);
+      text-transform: none;
+      font-weight: 400;
+    }
+
+    .see-btn {
+      display: inline-block;
+      text-align: left;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    .see-content {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .see-main {
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .see-small {
+      display: flex;
+      flex-direction: column;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .see-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--neon);
+      margin-top: 12px;
+      transition: transform 0.25s ease;
+      transform-origin: left;
+    }
+
+    .see-btn:hover .see-bar {
+      transform: scaleX(1.05);
+    }
+
+    .card-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .nft-card {
+      border-radius: 32px;
+      padding: 18px;
+      transition: background 0.25s ease, transform 0.25s ease;
+    }
+
+    .nft-card:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-8px);
+    }
+
+    .video-square {
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      padding-bottom: 100%;
+    }
+
+    .video-square video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .score-bar {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      border-radius: 20px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .score-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: rgba(239,244,255,0.7);
+    }
+
+    .score-value {
+      font-size: 16px;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+
+    .arrow-btn {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #b724ff, #7c3aed);
+      box-shadow: 0 10px 30px rgba(168,85,247,0.5);
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .arrow-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .final {
+      position: relative;
+      overflow: hidden;
+      background: var(--background);
+    }
+
+    .final-video {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .final-text-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 20px;
+    }
+
+    .final-text {
+      position: relative;
+      text-align: right;
+    }
+
+    .final-accent {
+      position: absolute;
+      left: -32px;
+      top: -32px;
+      color: var(--neon);
+      font-size: 17px;
+      mix-blend-mode: exclusion;
+      white-space: nowrap;
+      font-weight: 400;
+    }
+
+    .final-heading {
+      font-size: 16px;
+      line-height: 1;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .join-line {
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .final-social {
+      position: absolute;
+      left: 8%;
+      bottom: 12%;
+      display: flex;
+      flex-direction: column;
+      border-radius: 0.5rem;
+    }
+
+    .final-social button {
+      width: 14vw;
+      height: 12vw;
+      display: grid;
+      place-items: center;
+      transition: background 0.25s ease;
+    }
+
+    .final-social button:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .final-social button:not(:last-child) {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .final-social svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+
+    .services-page {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(111,255,0,0.13), transparent 24%),
+        radial-gradient(circle at 80% 10%, rgba(183,36,255,0.16), transparent 28%),
+        radial-gradient(circle at 50% 100%, rgba(124,58,237,0.24), transparent 34%),
+        #010828;
+      padding-top: 130px;
+      padding-bottom: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .services-orb {
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(111,255,0,0.22), transparent 65%);
+      filter: blur(16px);
+      top: 20%;
+      left: -160px;
+      animation: floatOrb 8s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    .services-orb.two {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(183,36,255,0.23), transparent 65%);
+      left: auto;
+      right: -180px;
+      top: 45%;
+      animation-duration: 10s;
+    }
+
+    @keyframes floatOrb {
+      from {
+        transform: translateY(-20px) scale(1);
+      }
+
+      to {
+        transform: translateY(40px) scale(1.08);
+      }
+    }
+
+    .page-hero-label {
+      color: var(--neon);
+      font-size: 38px;
+      font-weight: 400;
+      mix-blend-mode: exclusion;
+      margin-bottom: -8px;
+    }
+
+    .page-title {
+      font-size: 48px;
+      line-height: 0.95;
+      text-transform: uppercase;
+      font-weight: 400;
+      max-width: 900px;
+    }
+
+    .page-subtitle {
+      max-width: 620px;
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+      text-transform: uppercase;
+    }
+
+    .services-grid {
+      margin-top: 60px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .service-card {
+      border-radius: 32px;
+      padding: 28px;
+      min-height: 260px;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+      background: rgba(255,255,255,0.07);
+    }
+
+    .service-number {
+      color: var(--neon);
+      font-size: 52px;
+      line-height: 1;
+      margin-bottom: 32px;
+    }
+
+    .service-title {
+      font-size: 28px;
+      line-height: 1;
+      text-transform: uppercase;
+      font-weight: 400;
+      margin-bottom: 20px;
+    }
+
+    .service-text {
+      font-size: 13px;
+      line-height: 1.8;
+      text-transform: uppercase;
+      color: rgba(239,244,255,0.72);
+    }
+
+    .services-banner {
+      margin-top: 28px;
+      border-radius: 32px;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .services-banner h3 {
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    .services-banner p {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .forms-page {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(111,255,0,0.15), transparent 24%),
+        radial-gradient(circle at 80% 35%, rgba(183,36,255,0.18), transparent 28%),
+        radial-gradient(circle at 50% 100%, rgba(124,58,237,0.22), transparent 34%),
+        #010828;
+      position: relative;
+      overflow: hidden;
+      padding-top: 130px;
+      padding-bottom: 80px;
+    }
+
+    .forms-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 36px;
+      align-items: center;
+      margin-top: 52px;
+    }
+
+    .form-copy {
+      position: relative;
+    }
+
+    .form-copy h1 {
+      font-size: 46px;
+      line-height: 0.95;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .form-copy .script {
+      display: block;
+      color: var(--neon);
+      font-size: 54px;
+      line-height: 0.8;
+      margin-bottom: 4px;
+      mix-blend-mode: exclusion;
+      font-weight: 400;
+    }
+
+    .form-copy p {
+      margin-top: 24px;
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.9;
+      text-transform: uppercase;
+    }
+
+    .form-stats {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 520px;
+    }
+
+    .stat-box {
+      border-radius: 22px;
+      padding: 20px;
+    }
+
+    .stat-box strong {
+      display: block;
+      font-size: 32px;
+      line-height: 1;
+      color: var(--neon);
+    }
+
+    .stat-box span {
+      display: block;
+      margin-top: 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .review-form {
+      width: 100%;
+      border-radius: 34px;
+      padding: 24px;
+      position: relative;
+      overflow: visible;
+      animation: formFloat 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes formFloat {
+      from {
+        transform: translateY(0);
+      }
+
+      to {
+        transform: translateY(-10px);
+      }
+    }
+
+    .review-form::after {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: radial-gradient(circle at 20% 0%, rgba(111,255,0,0.14), transparent 35%),
+                  radial-gradient(circle at 90% 50%, rgba(183,36,255,0.14), transparent 35%);
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(20px);
+    }
+
+    .form-head {
+      margin-bottom: 26px;
+    }
+
+    .form-head h2 {
+      font-size: 34px;
+      line-height: 1;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .form-head p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+      text-transform: uppercase;
+    }
+
+    .field-group {
+      position: relative;
+      margin-bottom: 18px;
+    }
+
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.035);
+      color: var(--cream);
+      border-radius: 18px;
+      padding: 22px 18px 12px;
+      font-size: 14px;
+      min-height: 58px;
+      transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+    }
+
+    .field-group textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .field-group select {
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .field-group select option {
+      color: #010828;
+      background: #EFF4FF;
+    }
+
+    .field-group label {
+      position: absolute;
+      left: 18px;
+      top: 10px;
+      font-size: 10px;
+      color: rgba(239,244,255,0.58);
+      text-transform: uppercase;
+      pointer-events: none;
+      transition: color 0.25s ease;
+    }
+
+    .field-group input:focus,
+    .field-group select:focus,
+    .field-group textarea:focus {
+      border-color: var(--neon);
+      background: rgba(255,255,255,0.065);
+      transform: scale(1.015);
+    }
+
+    .field-group input:focus + label,
+    .field-group select:focus + label,
+    .field-group textarea:focus + label {
+      color: var(--neon);
+    }
+
+    .rating-options {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .rating-options input {
+      display: none;
+    }
+
+    .rating-options label {
+      min-height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.035);
+      color: var(--cream);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-size: 18px;
+      transform: translateY(0);
+    }
+
+    .rating-options input:checked + label,
+    .rating-options label:hover {
+      border-color: var(--neon);
+      background: rgba(111,255,0,0.12);
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px rgba(111,255,0,0.08);
+    }
+
+    .submit-review {
+      width: 100%;
+      min-height: 62px;
+      border-radius: 20px;
+      background: var(--neon);
+      color: #010828;
+      font-size: 18px;
+      text-transform: uppercase;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      margin-top: 6px;
+      transform: translateY(0);
+    }
+
+    .submit-review:hover {
+      transform: translateY(-4px) scale(1.015);
+      box-shadow: 0 20px 40px rgba(111,255,0,0.22);
+    }
+
+    .form-status {
+      margin-top: 18px;
+      min-height: 24px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .form-status.success {
+      color: var(--neon);
+    }
+
+    .form-status.error {
+      color: #ff6b6b;
+    }
+
+    .mini-panel {
+      margin-top: 22px;
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .mini-panel span {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      line-height: 1.6;
+    }
+
+    .mini-panel a {
+      color: var(--neon);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    @media (min-width: 640px) {
+      .container {
+        padding-left: 32px;
+        padding-right: 32px;
+      }
+
+      .header-inner {
+        padding-left: 32px;
+        padding-right: 32px;
+      }
+
+      .hero-title {
+        font-size: 60px;
+      }
+
+      .hero-accent {
+        font-size: 36px;
+      }
+
+      .about-inner {
+        padding-top: 80px;
+        padding-bottom: 80px;
+      }
+
+      .about-heading {
+        font-size: 48px;
+      }
+
+      .about-accent {
+        font-size: 52px;
+      }
+
+      .about-description {
+        font-size: 16px;
+      }
+
+      .collection-title {
+        font-size: 48px;
+      }
+
+      .collection-line-two {
+        margin-left: 96px;
+      }
+
+      .see-main {
+        font-size: 48px;
+      }
+
+      .see-small {
+        font-size: 28px;
+      }
+
+      .see-bar {
+        height: 8px;
+      }
+
+      .final-accent {
+        font-size: 38px;
+      }
+
+      .final-heading {
+        font-size: 36px;
+      }
+
+      .join-line {
+        margin-bottom: 32px;
+      }
+
+      .final-social {
+        bottom: 16%;
+        border-radius: 1rem;
+      }
+
+      .final-social button {
+        width: 14.375rem;
+        height: 5.5rem;
+      }
+
+      .final-social svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .page-title {
+        font-size: 72px;
+      }
+
+      .form-copy h1 {
+        font-size: 72px;
+      }
+
+      .form-copy .script {
+        font-size: 74px;
+      }
+
+      .review-form {
+        padding: 34px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .hero-title {
+        font-size: 75px;
+        line-height: 1;
+      }
+
+      .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .final-social button {
+        width: 10.78125rem;
+        height: 4.75rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .container {
+        padding-left: 48px;
+        padding-right: 48px;
+      }
+
+      .header-inner {
+        padding-left: 48px;
+        padding-right: 48px;
+      }
+
+      .nav {
+        display: block;
+      }
+
+      .mobile-menu-btn {
+        display: none;
+      }
+
+      .hero-title-wrap {
+        margin-left: 128px;
+      }
+
+      .hero-title {
+        font-size: 90px;
+      }
+
+      .hero-accent {
+        right: -80px;
+        font-size: 48px;
+      }
+
+      .desktop-social {
+        display: flex;
+      }
+
+      .mobile-social {
+        display: none;
+      }
+
+      .about-inner {
+        padding-top: 96px;
+        padding-bottom: 96px;
+      }
+
+      .about-top {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+
+      .about-heading {
+        font-size: 60px;
+      }
+
+      .about-accent {
+        font-size: 68px;
+      }
+
+      .about-bottom {
+        color: rgba(239,244,255,0.1);
+      }
+
+      .about-col-right {
+        display: flex;
+      }
+
+      .collection-header {
+        flex-direction: row;
+        align-items: flex-end;
+      }
+
+      .collection-title {
+        font-size: 60px;
+      }
+
+      .collection-line-two {
+        margin-left: 128px;
+      }
+
+      .see-main {
+        font-size: 60px;
+      }
+
+      .see-small {
+        font-size: 36px;
+      }
+
+      .see-bar {
+        height: 10px;
+      }
+
+      .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .final-text-wrap {
+        padding-left: 15%;
+        padding-right: 20%;
+      }
+
+      .final-accent {
+        font-size: 68px;
+      }
+
+      .final-heading {
+        font-size: 60px;
+      }
+
+      .join-line {
+        margin-bottom: 48px;
+      }
+
+      .final-social {
+        bottom: 20%;
+        border-radius: 1.25rem;
+      }
+
+      .final-social button {
+        width: 16.77rem;
+        height: 6.5rem;
+      }
+
+      .services-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .services-banner {
+        grid-template-columns: 0.85fr 1fr;
+        padding: 40px;
+      }
+
+      .forms-grid {
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 72px;
+      }
+
+      .form-copy h1 {
+        font-size: 92px;
+      }
+
+      .form-copy .script {
+        font-size: 92px;
+      }
+    }
+    /* cinematic depth */
+
+.services-page::after,
+.forms-page::after{
+content:"";
+position:absolute;
+inset:0;
+background:
+radial-gradient(circle at 20% 30%, rgba(111,255,0,0.15), transparent 30%),
+radial-gradient(circle at 80% 60%, rgba(183,36,255,0.2), transparent 40%);
+pointer-events:none;
+mix-blend-mode:screen;
+}
+
+/* glass hover upgrade */
+
+.liquid-glass:hover{
+transform:translateY(-6px);
+background:rgba(255,255,255,0.06);
+transition:all .3s ease;
+}
+
+/* ── NEW MULTI STEP FORMS ── */
+
+.forms-page {
+  min-height: 100vh;
+  padding: 130px 24px 80px;
+  position: relative;
+  overflow: hidden;
+  background: #010828;
+}
+
+.forms-page .forms-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.forms-page .forms-dark-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(111,255,0,0.15), transparent 30%),
+    radial-gradient(circle at 80% 60%, rgba(183,36,255,0.22), transparent 40%),
+    rgba(1,8,40,0.72);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  pointer-events: none;
+}
+
+.forms-page .forms-content {
+  position: relative;
+  z-index: 5;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-step {
+  display: none;
+}
+
+.form-step.active {
+  display: block;
+  animation: slideInRight 0.35s ease forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(36px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.form-field {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #EFF4FF;
+  font-family: monospace;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-field:focus {
+  border-color: #6FFF00;
+  box-shadow: 0 0 0 3px rgba(111,255,0,0.12);
+}
+
+.form-field::placeholder {
+  color: rgba(239,244,255,0.3);
+}
+
+textarea.form-field {
+  resize: none;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: background 0.3s, transform 0.3s;
+  flex-shrink: 0;
+}
+
+.dot.done {
+  background: #6FFF00;
+  transform: scale(1.2);
+}
+
+.submit-btn {
+  font-family: "Anton", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 15px;
+  background: #6FFF00;
+  color: #010828;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 36px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(111,255,0,0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.back-btn {
+  font-family: monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: rgba(239,244,255,0.35);
+  background: none;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.back-btn:hover {
+  color: #EFF4FF;
+}
+
+.svc-btn {
+  font-family: monospace;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #EFF4FF;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 15px 20px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.svc-btn:hover {
+  border-color: rgba(111,255,0,0.4);
+  background: rgba(111,255,0,0.04);
+}
+
+.svc-btn.selected {
+  border-color: #6FFF00;
+  background: rgba(111,255,0,0.08);
+  color: #6FFF00;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 36px;
+  transition: transform 0.15s;
+  line-height: 1;
+  color: #EFF4FF;
+  transform: scale(1);
+}
+
+.star-btn:hover {
+  transform: scale(1.3);
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0) rotate(-20deg);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.15) rotate(4deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.success-icon {
+  animation: popIn 0.55s ease forwards;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(1,8,40,0.3);
+  border-top-color: #010828;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-8px);
+  }
+
+  40% {
+    transform: translateX(8px);
+  }
+
+  60% {
+    transform: translateX(-5px);
+  }
+
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="texture-overlay"></div>
+
+  <header class="header-global">
+    <div class="header-inner">
+      <div class="logo font-grotesk" onclick="showPage('home')">AxyonShield</div>
+
+      <div class="lang-selector liquid-glass animate-fade-up" id="langSelector">
+        <button class="lang-toggle font-grotesk" id="langToggle" onclick="toggleLangMenu()" aria-haspopup="listbox" aria-expanded="false">
+          <span id="langLabel">ES</span>
+          <span id="langLabelText">Español</span>
+        </button>
+        <div class="lang-menu" id="langMenu" role="listbox">
+          <button type="button" class="lang-option active" data-lang="es" onclick="setLanguage('es')">Español</button>
+          <button type="button" class="lang-option" data-lang="en" onclick="setLanguage('en')">English</button>
+        </div>
+      </div>
+
+      <nav class="nav liquid-glass">
+        <div class="nav-links font-grotesk">
+          <a href="#" id="navHome" class="nav-link active-link" data-page="home">Inicio</a>
+          <a href="#" id="navServices" class="nav-link" data-page="services">Servicios</a>
+          <a href="#" id="navForms" class="nav-link" data-page="forms">Formularios</a>
+        </div>
+      </nav>
+
+      <button class="mobile-menu-btn liquid-glass" onclick="openMobileMenu()" aria-label="Abrir menú">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
+          <path d="M4 7H20M4 12H20M4 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-box liquid-glass">
+      <div class="mobile-menu-top">
+        <div class="logo font-grotesk">AxyonShield</div>
+
+        <button class="mobile-close liquid-glass" onclick="closeMobileMenu()" aria-label="Cerrar menú">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="mobile-menu-links font-grotesk">
+        <a href="#" id="mobileNavHome" onclick="showPage('home'); closeMobileMenu();">Inicio</a>
+        <a href="#" id="mobileNavServices" onclick="showPage('services'); closeMobileMenu();">Servicios</a>
+        <a href="#" id="mobileNavForms" onclick="showPage('forms'); closeMobileMenu();">Formularios</a>
+      </div>
+
+      <div class="mobile-lang-picker">
+        <button type="button" class="mobile-lang-btn active" id="mobileLangEs" onclick="setLanguage('es'); closeMobileMenu()">Español</button>
+        <button type="button" class="mobile-lang-btn" id="mobileLangEn" onclick="setLanguage('en'); closeMobileMenu()">English</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div id="homePage" class="page active">
+      <section class="hero">
+        <video
+          class="section-video"
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+
+        <div class="container hero-inner">
+          <div class="hero-content">
+            <div class="hero-title-wrap">
+              <h1 id="heroTitle" class="hero-title font-grotesk animate-fade-up">
+                Más allá del código<br>
+                y de sus límites conocidos
+              </h1>
+
+              <div id="heroAccent" class="hero-accent font-condiment">Soluciones personalizadas</div>
+
+              <div class="mobile-social">
+                <button class="social-btn liquid-glass" aria-label="Correo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M4 4h16v16H4z"></path>
+                    <path d="m22 6-10 7L2 6"></path>
+                  </svg>
+                </button>
+
+                <button class="social-btn liquid-glass" aria-label="Twitter">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M22 4.01c-.77.35-1.6.58-2.47.69a4.3 4.3 0 0 0 1.88-2.37 8.6 8.6 0 0 1-2.72 1.04A4.28 4.28 0 0 0 11.4 7.3 12.14 12.14 0 0 1 2.58 2.83a4.28 4.28 0 0 0 1.32 5.71 4.22 4.22 0 0 1-1.94-.54v.05a4.28 4.28 0 0 0 3.43 4.2 4.3 4.3 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.97A8.6 8.6 0 0 1 2 17.15 12.1 12.1 0 0 0 8.56 19.1c7.88 0 12.2-6.53 12.2-12.2v-.56A8.7 8.7 0 0 0 22 4.01z"></path>
+                  </svg>
+                </button>
+
+                <button class="social-btn liquid-glass" aria-label="Github">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="desktop-social">
+              <button class="social-btn liquid-glass" aria-label="Correo">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M4 4h16v16H4z"></path>
+                  <path d="m22 6-10 7L2 6"></path>
+                </svg>
+              </button>
+
+              <button class="social-btn liquid-glass" aria-label="Twitter">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M22 4.01c-.77.35-1.6.58-2.47.69a4.3 4.3 0 0 0 1.88-2.37 8.6 8.6 0 0 1-2.72 1.04A4.28 4.28 0 0 0 11.4 7.3 12.14 12.14 0 0 1 2.58 2.83a4.28 4.28 0 0 0 1.32 5.71 4.22 4.22 0 0 1-1.94-.54v.05a4.28 4.28 0 0 0 3.43 4.2 4.3 4.3 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.97A8.6 8.6 0 0 1 2 17.15 12.1 12.1 0 0 0 8.56 19.1c7.88 0 12.2-6.53 12.2-12.2v-.56A8.7 8.7 0 0 0 22 4.01z"></path>
+                </svg>
+              </button>
+
+              <button class="social-btn liquid-glass" aria-label="Github">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="about">
+        <video
+          class="section-video"
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_151551_992053d1-3d3e-4b8c-abac-45f22158f411.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+
+        <div class="container about-inner">
+          <div class="about-top">
+            <div class="about-heading-wrap">
+              <h2 id="aboutHeading" class="about-heading font-grotesk animate-fade-up">
+                ¡Hola!<br>
+                soy Axyon
+              </h2>
+              <div id="aboutAccent" class="about-accent font-condiment">Axyon</div>
+            </div>
+
+            <p id="aboutDescription" class="about-description about-text">
+              Un sistema digital diseñado más allá de límites y plataformas. Enfocado en automatización, desarrollo y soluciones escalables.
+            </p>
+          </div>
+
+          <div class="about-bottom">
+            <div class="about-col">
+              <p class="about-text">Un sistema digital diseñado más allá de límites y plataformas. Enfocado en automatización, desarrollo y soluciones escalables.</p>
+              <p class="about-text">Un sistema digital diseñado más allá de límites y plataformas. Enfocado en automatización, desarrollo y soluciones escalables.</p>
+            </div>
+
+            <div class="about-col about-col-right">
+              <p class="about-text">Un sistema digital diseñado más allá de límites y plataformas. Enfocado en automatización, desarrollo y soluciones escalables.</p>
+              <p class="about-text">Un sistema digital diseñado más allá de límites y plataformas. Enfocado en automatización, desarrollo y soluciones escalables.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="collection">
+        <div class="container">
+          <div class="collection-header">
+            <h2 id="collectionTitle" class="collection-title font-grotesk animate-fade-up">
+              Colección de<br>
+              <span class="collection-line-two">
+                <span id="collectionDigital" class="collection-digital">sistemas</span> digitales
+              </span>
+            </h2>
+
+            <button class="see-btn font-grotesk" onclick="showPage('services')">
+              <div class="see-content">
+                <span id="seeMain" class="see-main">VER</span>
+                <span class="see-small">
+                  <span id="seeSmallTop">TODOS</span>
+                  <span id="seeSmallBottom">LOS PROYECTOS</span>
+                </span>
+              </div>
+              <div class="see-bar"></div>
+            </button>
+          </div>
+
+          <div class="card-grid">
+            <article class="nft-card liquid-glass">
+              <div class="video-square">
+                <video
+                  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_053923_22c0a6a5-313c-474c-85ff-3b50d25e944a.mp4"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                ></video>
+
+                <div class="score-bar liquid-glass">
+                  <div>
+                    <p class="score-label">Puntuación:</p>
+                    <p class="score-value">8.7/10</p>
+                  </div>
+
+                  <button class="arrow-btn" aria-label="Open">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <path d="M5 12H19M13 6L19 12L13 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <article class="nft-card liquid-glass">
+              <div class="video-square">
+                <video
+                  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_054411_511c1b7a-fb2f-42ef-bf6c-32c0b1a06e79.mp4"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                ></video>
+
+                <div class="score-bar liquid-glass">
+                  <div>
+                    <p class="score-label">Puntuación:</p>
+                    <p class="score-value">9/10</p>
+                  </div>
+
+                  <button class="arrow-btn" aria-label="Open">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <path d="M5 12H19M13 6L19 12L13 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <article class="nft-card liquid-glass">
+              <div class="video-square">
+                <video
+                  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_055427_ac7035b5-9f3b-4289-86fc-941b2432317d.mp4"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                ></video>
+
+                <div class="score-bar liquid-glass">
+                  <div>
+                    <p class="score-label">Puntuación:</p>
+                    <p class="score-value">8.2/10</p>
+                  </div>
+
+                  <button class="arrow-btn" aria-label="Open">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <path d="M5 12H19M13 6L19 12L13 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="final">
+        <video
+          class="final-video"
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_055729_72d66327-b59e-4ae9-bb70-de6ccb5ecdb0.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+
+        <div class="final-text-wrap">
+          <div class="final-text">
+            <div class="final-accent font-condiment">Ve más allá</div>
+
+            <h2 class="final-heading font-grotesk animate-fade-up">
+              <span class="join-line">ÚNETE.</span>
+              CONSTRUYE LO SIGUIENTE.<br>
+              AUTOMATIZA TODO.<br>
+              SIGUE EL SISTEMA.
+            </h2>
+          </div>
+        </div>
+
+        <div class="final-social liquid-glass">
+          <button aria-label="Correo">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M4 4h16v16H4z"></path>
+              <path d="m22 6-10 7L2 6"></path>
+            </svg>
+          </button>
+
+          <button aria-label="Twitter">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M22 4.01c-.77.35-1.6.58-2.47.69a4.3 4.3 0 0 0 1.88-2.37 8.6 8.6 0 0 1-2.72 1.04A4.28 4.28 0 0 0 11.4 7.3 12.14 12.14 0 0 1 2.58 2.83a4.28 4.28 0 0 0 1.32 5.71 4.22 4.22 0 0 1-1.94-.54v.05a4.28 4.28 0 0 0 3.43 4.2 4.3 4.3 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.97A8.6 8.6 0 0 1 2 17.15 12.1 12.1 0 0 0 8.56 19.1c7.88 0 12.2-6.53 12.2-12.2v-.56A8.7 8.7 0 0 0 22 4.01z"></path>
+            </svg>
+          </button>
+
+          <button aria-label="Github">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <div id="servicesPage" class="page">
+      <section class="services-page">
+  <video
+    class="section-video"
+    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_151551_992053d1-3d3e-4b8c-abac-45f22158f411.mp4"
+    autoplay muted loop playsinline
+  ></video>
+
+  <div style="position:absolute;inset:0;background:rgba(1,8,40,0.65);backdrop-filter:blur(6px);"></div>
+        <div class="services-orb"></div>
+        <div class="services-orb two"></div>
+
+        <div class="container">
+          <div id="servicesLabel" class="page-hero-label font-condiment animate-fade-up">Nuestro sistema</div>
+
+          <h1 id="servicesTitle" class="page-title font-grotesk animate-fade-up">
+            Servicios diseñados para velocidad, automatización y escala digital.
+          </h1>
+
+          <p id="servicesSubtitle" class="page-subtitle">
+          </p>
+
+          <div class="services-grid">
+            <article class="service-card liquid-glass">
+              <div class="service-number font-condiment">01</div>
+              <h2 id="service1Title" class="service-title font-grotesk">Automatización</h2>
+              <p id="service1Text" class="service-text">
+                Flujos inteligentes que eliminan tareas repetitivas, conectan herramientas y mantienen tu operación digital en movimiento sin fricción manual.
+              </p>
+            </article>
+
+            <article class="service-card liquid-glass">
+              <div class="service-number font-condiment">02</div>
+              <h2 id="service2Title" class="service-title font-grotesk">Desarrollo</h2>
+              <p id="service2Text" class="service-text">
+                Interfaces web, paneles, landing pages, lógica de backend y sistemas escalables diseñados en torno a tu proyecto exacto.
+              </p>
+            </article>
+
+            <article class="service-card liquid-glass">
+              <div class="service-number font-condiment">03</div>
+              <h2 id="service3Title" class="service-title font-grotesk">Seguridad</h2>
+              <p id="service3Text" class="service-text">
+                Estructura, control de acceso y arquitectura moderna enfocados en proteger tus datos, tus clientes y tu plataforma.
+              </p>
+            </article>
+
+            <article class="service-card liquid-glass">
+              <div class="service-number font-condiment">04</div>
+              <h2 id="service4Title" class="service-title font-grotesk">Diseño digital</h2>
+              <p id="service4Text" class="service-text">
+                Interfaces premium con visuales oscuros, paneles glassmorphism, secciones cinematográficas y presentación futurista en primera persona.
+              </p>
+            </article>
+          </div>
+
+          <div class="services-banner liquid-glass">
+            <h3 id="servicesBannerTitle" class="font-grotesk">Cada sistema es personalizado.</h3>
+            <p id="servicesBannerText">
+              Desde formularios y paneles hasta servicios automatizados y plataformas digitales completas, AxyonShield construye cada solución con rendimiento, claridad e impacto visual en mente.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+<div id="formsPage" class="page">
+  <section class="forms-page">
+    <video
+      class="forms-bg-video"
+      autoplay
+      muted
+      loop
+      playsinline
+    >
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_055729_72d66327-b59e-4ae9-bb70-de6ccb5ecdb0.mp4" type="video/mp4" />
+    </video>
+
+    <div class="forms-dark-overlay"></div>
+
+    <div class="forms-content">
+      <div style="margin-bottom:52px;">
+        <span id="formsLabel" style="font-family:'Condiment',cursive;color:#6FFF00;font-size:26px;display:block;margin-bottom:6px;">
+          Tu opinión importa
+        </span>
+
+        <h1 id="formsTitle" style="font-family:'Anton',sans-serif;font-size:clamp(40px,7vw,80px);text-transform:uppercase;color:#EFF4FF;line-height:.95;">
+          Valora<br />
+          <span id="formsTitleAccent" style="color:#6FFF00;">Nuestros</span><br />
+          Servicios
+        </h1>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;" id="progress-dots">
+        <div class="dot done" id="dot-1"></div>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,.1);"></div>
+        <div class="dot" id="dot-2"></div>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,.1);"></div>
+        <div class="dot" id="dot-3"></div>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,.1);"></div>
+        <div class="dot" id="dot-4"></div>
+      </div>
+
+      <p style="font-family:monospace;font-size:11px;color:rgba(239,244,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:40px;" id="step-counter">
+        Paso 1 de 4
+      </p>
+
+      <div class="form-step active" id="step-1">
+<label id="step1Label" style="font-family:'Anton',sans-serif;font-size:12px;text-transform:uppercase;color:rgba(239,244,255,.4);letter-spacing:.1em;display:block;margin-bottom:10px;">
+          01 — Nombre
+        </label>
+
+        <h2 id="step1Heading" style="font-family:'Anton',sans-serif;font-size:clamp(22px,4vw,36px);text-transform:uppercase;color:#EFF4FF;margin-bottom:28px;line-height:1.1;">
+          ¿Cómo te<br />
+          llamamos?
+        </h2>
+
+        <input
+          id="input-nombre"
+          class="form-field"
+          type="text"
+          placeholder="Tu nombre completo..."
+          autocomplete="off"
+        />
+
+        <div style="margin-top:28px;display:flex;justify-content:flex-end;">
+          <button id="step1Next" class="submit-btn" onclick="nextStep(1)">
+            <span id="step1NextText">Siguiente</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#010828" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-step" id="step-2">
+<label id="step2Label" style="font-family:'Anton',sans-serif;font-size:12px;text-transform:uppercase;color:rgba(239,244,255,.4);letter-spacing:.1em;display:block;margin-bottom:10px;">
+          02 — Servicio
+        </label>
+
+        <h2 id="step2Heading" style="font-family:'Anton',sans-serif;font-size:clamp(22px,4vw,36px);text-transform:uppercase;color:#EFF4FF;margin-bottom:28px;line-height:1.1;">
+          ¿Qué servicio<br />
+          utilizaste?
+        </h2>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button id="serviceOption1" class="svc-btn" onclick="selectService(this,'Desarrollo')">Desarrollo</button>
+          <button id="serviceOption2" class="svc-btn" onclick="selectService(this,'Automatización')">Automatización</button>
+          <button id="serviceOption3" class="svc-btn" onclick="selectService(this,'Diseño UI / UX')">Diseño UI / UX</button>
+          <button id="serviceOption4" class="svc-btn" onclick="selectService(this,'Sistemas escalables')">Sistemas escalables</button>
+          <button id="serviceOption5" class="svc-btn" onclick="selectService(this,'Seguridad y auditoría')">Seguridad y auditoría</button>
+          <button id="serviceOption6" class="svc-btn" onclick="selectService(this,'Consultoría')">Consultoría</button>
+        </div>
+
+        <div style="margin-top:28px;display:flex;justify-content:space-between;align-items:center;">
+          <button id="step2Back" onclick="prevStep(2)" class="back-btn">
+            ← Atrás
+          </button>
+
+          <button class="submit-btn" id="step2Next" onclick="nextStep(2)" disabled>
+            <span id="step2NextText">Siguiente</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#010828" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-step" id="step-3">
+<label id="step3Label" style="font-family:'Anton',sans-serif;font-size:12px;text-transform:uppercase;color:rgba(239,244,255,.4);letter-spacing:.1em;display:block;margin-bottom:10px;">
+          03 — Valoración
+        </label>
+
+        <h2 id="step3Heading" style="font-family:'Anton',sans-serif;font-size:clamp(22px,4vw,36px);text-transform:uppercase;color:#EFF4FF;margin-bottom:32px;line-height:1.1;">
+          ¿Cuántas<br />
+          estrellas nos das?
+        </h2>
+
+        <div style="display:flex;gap:6px;justify-content:center;margin-bottom:14px;" id="stars-row">
+          <button class="star-btn" onclick="setStar(1)">☆</button>
+          <button class="star-btn" onclick="setStar(2)">☆</button>
+          <button class="star-btn" onclick="setStar(3)">☆</button>
+          <button class="star-btn" onclick="setStar(4)">☆</button>
+          <button class="star-btn" onclick="setStar(5)">☆</button>
+        </div>
+
+        <p id="starLabel" style="font-family:monospace;font-size:13px;color:rgba(239,244,255,.35);text-align:center;letter-spacing:.05em;text-transform:uppercase;">
+          Selecciona una valoración
+        </p>
+
+        <div style="margin-top:36px;display:flex;justify-content:space-between;align-items:center;">
+          <button id="step3Back" onclick="prevStep(3)" class="back-btn">
+            ← Atrás
+          </button>
+
+          <button class="submit-btn" id="step3Next" onclick="nextStep(3)" disabled>
+            <span id="step3NextText">Siguiente</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#010828" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-step" id="step-4">
+<label id="step4Label" style="font-family:'Anton',sans-serif;font-size:12px;text-transform:uppercase;color:rgba(239,244,255,.4);letter-spacing:.1em;display:block;margin-bottom:10px;">
+          04 — Sugerencia
+        </label>
+
+        <h2 id="step4Heading" style="font-family:'Anton',sans-serif;font-size:clamp(22px,4vw,36px);text-transform:uppercase;color:#EFF4FF;margin-bottom:28px;line-height:1.1;">
+          ¿Qué podemos<br />
+          mejorar?
+        </h2>
+
+        <textarea
+          id="input-sugerencia"
+          class="form-field"
+          rows="5"
+          placeholder="Cuéntanos tu experiencia o sugerencias..."
+        ></textarea>
+
+        <div style="margin-top:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <button onclick="prevStep(4)" class="back-btn">
+            ← Atrás
+          </button>
+
+          <button class="submit-btn" id="submitFinal" onclick="submitForm()">
+            <span id="submitFinalText">Enviar valoración</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#010828" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m22 2-7 20-4-9-9-4 20-7z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-step" id="step-success" style="text-align:center;padding:40px 0;">
+        <div class="success-icon" style="font-size:72px;margin-bottom:24px;">
+          ✅
+        </div>
+
+        <h2 id="successTitle" style="font-family:'Anton',sans-serif;font-size:clamp(32px,6vw,56px);text-transform:uppercase;color:#EFF4FF;line-height:1;margin-bottom:16px;">
+          ¡Gracias<br />
+          <span style="color:#6FFF00;">por tu</span><br />
+          valoración!
+        </h2>
+
+        <p id="successDescription" style="font-family:monospace;font-size:13px;color:rgba(239,244,255,.5);text-transform:uppercase;letter-spacing:.04em;line-height:1.8;margin-bottom:36px;">
+          Tu opinión ha sido guardada.<br />
+          La revisaremos muy pronto.
+        </p>
+
+        <button
+          id="successAction"
+          onclick="resetForm()"
+          style="font-family:monospace;font-size:13px;text-transform:uppercase;color:rgba(239,244,255,.4);background:none;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px 24px;cursor:pointer;transition:all .2s;letter-spacing:.05em;"
+          onmouseover="this.style.borderColor='#6FFF00';this.style.color='#6FFF00'"
+          onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='rgba(239,244,255,.4)'"
+        >
+          Enviar otra valoración
+        </button>
+      </div>
+
+      <div id="form-error" style="display:none;margin-top:16px;padding:14px 18px;background:rgba(255,60,60,.07);border:1px solid rgba(255,60,60,.2);border-radius:12px;">
+        <p style="font-family:monospace;font-size:13px;color:#ff7070;text-transform:uppercase;letter-spacing:.04em;" id="error-msg">
+          Error al enviar. Inténtalo de nuevo.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+  </main>
+
+  <script>
+    const pages = {
+      home: document.getElementById("homePage"),
+      services: document.getElementById("servicesPage"),
+      forms: document.getElementById("formsPage")
+    };
+
+    const navLinks = document.querySelectorAll(".nav-link");
+    const langToggle = document.getElementById("langToggle");
+    const langMenu = document.getElementById("langMenu");
+    const mobileLangEs = document.getElementById("mobileLangEs");
+    const mobileLangEn = document.getElementById("mobileLangEn");
+    let currentLanguage = "es";
+
+    const translations = {
+      es: {
+        documentTitle: "AxyonShield",
+        langCode: "ES",
+        langLabel: "Español",
+        navHome: "Inicio",
+        navServices: "Servicios",
+        navForms: "Formularios",
+        mobileNavHome: "Inicio",
+        mobileNavServices: "Servicios",
+        mobileNavForms: "Formularios",
+        heroTitle: "Más allá del código<br>y de sus límites conocidos",
+        heroAccent: "Soluciones personalizadas",
+        aboutHeading: "¡Hola!<br>soy Axyon",
+        aboutDescription: "Un sistema digital diseñado más allá de límites y plataformas. Enfocado en automatización, desarrollo y soluciones escalables.",
+        collectionTitle: "Colección de<br><span class=\"collection-line-two\"><span class=\"collection-digital\">sistemas</span> digitales</span>",
+        seeMain: "VER",
+        seeSmallTop: "TODOS",
+        seeSmallBottom: "LOS PROYECTOS",
+        finalAccent: "Ve más allá",
+        finalHeading: "<span class=\"join-line\">ÚNETE.</span> CONSTRUYE LO SIGUIENTE.<br>AUTOMATIZA TODO.<br>SIGUE EL SISTEMA.",
+        servicesLabel: "Nuestro sistema",
+        servicesTitle: "Servicios diseñados para velocidad, automatización y escala digital.",
+        servicesSubtitle: "AxyonShield crea sistemas personalizados, flujos automatizados, plataformas digitales seguras y experiencias web futuristas pensadas para superar los límites habituales.",
+        service1Title: "Automatización",
+        service1Text: "Flujos inteligentes que eliminan tareas repetitivas, conectan herramientas y mantienen tu operación digital en movimiento sin fricción manual.",
+        service2Title: "Desarrollo",
+        service2Text: "Interfaces web, paneles, landing pages, lógica de backend y sistemas escalables diseñados en torno a tu proyecto exacto.",
+        service3Title: "Seguridad",
+        service3Text: "Estructura, control de acceso y arquitectura moderna enfocados en proteger tus datos, tus clientes y tu plataforma.",
+        service4Title: "Diseño digital",
+        service4Text: "Interfaces premium con visuales oscuros, paneles glassmorphism, secciones cinematográficas y presentación futurista en primera persona.",
+        servicesBannerTitle: "Cada sistema es personalizado.",
+        servicesBannerText: "Desde formularios y paneles hasta servicios automatizados y plataformas digitales completas, AxyonShield construye cada solución con rendimiento, claridad e impacto visual en mente.",
+        formsLabel: "Tu opinión importa",
+        formsTitle: "Valora<br><span style=\"color:#6FFF00;\">Nuestros</span><br>Servicios",
+        stepCounter: "Paso {step} de 4",
+        step1Label: "01 — Nombre",
+        step1Heading: "¿Cómo te<br>llamamos?",
+        namePlaceholder: "Tu nombre completo...",
+        step1Next: "Siguiente",
+        step2Label: "02 — Servicio",
+        step2Heading: "¿Qué servicio<br>utilizaste?",
+        serviceOption1: "Desarrollo",
+        serviceOption2: "Automatización",
+        serviceOption3: "Diseño UI / UX",
+        serviceOption4: "Sistemas escalables",
+        serviceOption5: "Seguridad y auditoría",
+        serviceOption6: "Consultoría",
+        step2Back: "← Atrás",
+        step2Next: "Siguiente",
+        step3Label: "03 — Valoración",
+        step3Heading: "¿Cuántas<br>estrellas nos das?",
+        step3Back: "← Atrás",
+        step3Next: "Siguiente",
+        starPlaceholder: "Selecciona una valoración",
+        starLabels: ["", "Muy malo ☹", "Malo", "Regular 😐", "Bueno", "Excelente ★"],
+        step4Label: "04 — Sugerencia",
+        step4Heading: "¿Qué podemos<br>mejorar?",
+        suggestionPlaceholder: "Cuéntanos tu experiencia o sugerencias...",
+        submitButton: "Enviar valoración",
+        successTitle: "¡Gracias<br><span style=\"color:#6FFF00;\">por tu</span><br>valoración!",
+        successDescription: "Tu opinión ha sido guardada.<br>La revisaremos muy pronto.",
+        successAction: "Enviar otra valoración",
+        errorDefault: "Error al enviar. Inténtalo de nuevo.",
+        firebaseUnavailable: "Firebase no disponible. Inténtalo más tarde.",
+        sending: "Enviando..."
+      },
+      en: {
+        documentTitle: "AxyonShield",
+        langCode: "EN",
+        langLabel: "English",
+        navHome: "Home",
+        navServices: "Services",
+        navForms: "Forms",
+        mobileNavHome: "Home",
+        mobileNavServices: "Services",
+        mobileNavForms: "Forms",
+        heroTitle: "Beyond code<br>and its known limits",
+        heroAccent: "Tailored solutions",
+        aboutHeading: "Hello!<br>I'm Axyon",
+        aboutDescription: "A digital system designed beyond limits and platforms. Focused on automation, development and scalable solutions.",
+        collectionTitle: "Collection of<br><span class=\"collection-line-two\"><span class=\"collection-digital\">digital</span> systems</span>",
+        seeMain: "VIEW",
+        seeSmallTop: "ALL",
+        seeSmallBottom: "PROJECTS",
+        finalAccent: "Go beyond",
+        finalHeading: "<span class=\"join-line\">JOIN.</span> BUILD WHAT'S NEXT.<br>AUTOMATE EVERYTHING.<br>FOLLOW THE SYSTEM.",
+        servicesLabel: "Our system",
+        servicesTitle: "Services built for speed, automation and digital scale.",
+        servicesSubtitle: "AxyonShield crafts custom systems, automated workflows, secure digital platforms and futuristic web experiences designed to exceed ordinary boundaries.",
+        service1Title: "Automation",
+        service1Text: "Smart workflows that remove repetitive tasks, connect tools and keep your digital operation moving without manual friction.",
+        service2Title: "Development",
+        service2Text: "Web interfaces, dashboards, landing pages, backend logic and scalable systems built around your exact project.",
+        service3Title: "Security",
+        service3Text: "Structure, access control and modern architecture focused on protecting your data, your customers and your platform.",
+        service4Title: "Digital design",
+        service4Text: "Premium interfaces with dark visuals, glassmorphism panels, cinematic sections and futuristic first-person presentation.",
+        servicesBannerTitle: "Every system is custom.",
+        servicesBannerText: "From forms and dashboards to automated services and full digital platforms, AxyonShield builds every solution with performance, clarity and visual impact in mind.",
+        formsLabel: "Your feedback matters",
+        formsTitle: "Rate<br><span style=\"color:#6FFF00;\">Our</span><br>Services",
+        stepCounter: "Step {step} of 4",
+        step1Label: "01 — Name",
+        step1Heading: "What should<br>we call you?",
+        namePlaceholder: "Your full name...",
+        step1Next: "Next",
+        step2Label: "02 — Service",
+        step2Heading: "Which service<br>did you use?",
+        serviceOption1: "Development",
+        serviceOption2: "Automation",
+        serviceOption3: "UI / UX Design",
+        serviceOption4: "Scalable systems",
+        serviceOption5: "Security & auditing",
+        serviceOption6: "Consulting",
+        step2Back: "← Back",
+        step2Next: "Next",
+        step3Label: "03 — Rating",
+        step3Heading: "How many<br>stars do you give us?",
+        step3Back: "← Back",
+        step3Next: "Next",
+        starPlaceholder: "Choose a rating",
+        starLabels: ["", "Very poor ☹", "Poor", "Average 😐", "Good", "Excellent ★"],
+        step4Label: "04 — Suggestion",
+        step4Heading: "What can<br>we improve?",
+        suggestionPlaceholder: "Tell us your experience or suggestions...",
+        submitButton: "Send review",
+        successTitle: "Thank you<br><span style=\"color:#6FFF00;\">for your</span><br>feedback!",
+        successDescription: "Your opinion has been saved.<br>We will review it very soon.",
+        successAction: "Send another review",
+        errorDefault: "Submission failed. Try again.",
+        firebaseUnavailable: "Firebase unavailable. Please try later.",
+        sending: "Sending..."
+      }
+    };
+
+    const icons = {
+      arrow: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#010828" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>',
+      send: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#010828" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"></path></svg>'
+    };
+
+    const textMap = {
+      navHome: "#navHome",
+      navServices: "#navServices",
+      navForms: "#navForms",
+      mobileNavHome: "#mobileNavHome",
+      mobileNavServices: "#mobileNavServices",
+      mobileNavForms: "#mobileNavForms",
+      heroTitle: "#heroTitle",
+      heroAccent: "#heroAccent",
+      aboutHeading: "#aboutHeading",
+      aboutDescription: "#aboutDescription",
+      collectionTitle: "#collectionTitle",
+      seeMain: "#seeMain",
+      seeSmallTop: "#seeSmallTop",
+      seeSmallBottom: "#seeSmallBottom",
+      finalAccent: "#finalAccent",
+      finalHeading: "#finalHeading",
+      servicesLabel: "#servicesLabel",
+      servicesTitle: "#servicesTitle",
+      servicesSubtitle: "#servicesSubtitle",
+      service1Title: "#service1Title",
+      service1Text: "#service1Text",
+      service2Title: "#service2Title",
+      service2Text: "#service2Text",
+      service3Title: "#service3Title",
+      service3Text: "#service3Text",
+      service4Title: "#service4Title",
+      service4Text: "#service4Text",
+      servicesBannerTitle: "#servicesBannerTitle",
+      servicesBannerText: "#servicesBannerText",
+      formsLabel: "#formsLabel",
+      formsTitle: "#formsTitle",
+      step1Label: "#step1Label",
+      step1Heading: "#step1Heading",
+      step1Next: "#step1NextText",
+      step2Label: "#step2Label",
+      step2Heading: "#step2Heading",
+      step2Back: "#step2Back",
+      step2Next: "#step2NextText",
+      step3Label: "#step3Label",
+      step3Heading: "#step3Heading",
+      step3Back: "#step3Back",
+      step3Next: "#step3NextText",
+      step4Label: "#step4Label",
+      step4Heading: "#step4Heading",
+      submitButton: "#submitFinalText",
+      successTitle: "#successTitle",
+      successDescription: "#successDescription",
+      successAction: "#successAction"
+    };
+
+    const setText = (selector, value, useHtml = false) => {
+      const element = document.querySelector(selector);
+      if (!element) return;
+      if (useHtml) {
+        element.innerHTML = value;
+      } else {
+        element.textContent = value;
+      }
+    };
+
+    const setPlaceholder = (selector, value) => {
+      const element = document.querySelector(selector);
+      if (!element) return;
+      element.placeholder = value;
+    };
+
+    const setServiceOptions = (keys) => {
+      keys.forEach((key, index) => {
+        const element = document.getElementById(`serviceOption${index + 1}`);
+        if (element) element.textContent = translations[currentLanguage][key];
+      });
+    };
+
+    const updateLanguageMenuState = () => {
+      document.querySelectorAll(".lang-option").forEach((button) => {
+        const isActive = button.dataset.lang === currentLanguage;
+        button.classList.toggle("active", isActive);
+      });
+      if (mobileLangEs && mobileLangEn) {
+        mobileLangEs.classList.toggle("active", currentLanguage === "es");
+        mobileLangEn.classList.toggle("active", currentLanguage === "en");
+      }
+      if (langToggle) {
+        langToggle.setAttribute("aria-expanded", langMenu.classList.contains("open").toString());
+      }
+    };
+
+    const applyLanguage = () => {
+      document.title = translations[currentLanguage].documentTitle;
+      document.documentElement.lang = currentLanguage;
+
+      Object.keys(textMap).forEach((key) => {
+        const target = textMap[key];
+        const htmlKeys = [
+          "heroTitle",
+          "aboutHeading",
+          "collectionTitle",
+          "finalHeading",
+          "formsTitle",
+          "step1Heading",
+          "step2Heading",
+          "step3Heading",
+          "step4Heading",
+          "successTitle"
+        ];
+        setText(target, translations[currentLanguage][key], htmlKeys.includes(key));
+      });
+
+      setPlaceholder("#input-nombre", translations[currentLanguage].namePlaceholder);
+      setPlaceholder("#input-sugerencia", translations[currentLanguage].suggestionPlaceholder);
+      setText("#step1NextText", translations[currentLanguage].step1Next);
+      setText("#step2NextText", translations[currentLanguage].step2Next);
+      setText("#step3NextText", translations[currentLanguage].step3Next);
+      setText("#step2Back", translations[currentLanguage].step2Back);
+      setText("#step3Back", translations[currentLanguage].step3Back);
+      setText("#submitFinalText", translations[currentLanguage].submitButton);
+      setText("#successAction", translations[currentLanguage].successAction);
+      setText("#langLabelText", translations[currentLanguage].langLabel);
+      setText("#langLabel", translations[currentLanguage].langCode);
+      setText("#error-msg", translations[currentLanguage].errorDefault);
+      setServiceOptions(["serviceOption1", "serviceOption2", "serviceOption3", "serviceOption4", "serviceOption5", "serviceOption6"]);
+      updateDots(Math.min(4, Math.max(1, Number(document.getElementById("step-counter")?.textContent?.match(/\d+/)?.[0] || 1))));
+      updateLanguageMenuState();
+    };
+
+    const toggleLangMenu = () => {
+      if (!langMenu) return;
+      langMenu.classList.toggle("open");
+      updateLanguageMenuState();
+    };
+
+    const setLanguage = (lang) => {
+      if (!translations[lang]) return;
+      currentLanguage = lang;
+      if (langMenu) langMenu.classList.remove("open");
+      applyLanguage();
+    };
+
+    document.addEventListener("click", (event) => {
+      if (!langMenu || !langToggle) return;
+      if (!langMenu.contains(event.target) && !langToggle.contains(event.target)) {
+        langMenu.classList.remove("open");
+        updateLanguageMenuState();
+      }
+    });
+
+    const serviceOptionKeys = [
+      "serviceOption1",
+      "serviceOption2",
+      "serviceOption3",
+      "serviceOption4",
+      "serviceOption5",
+      "serviceOption6"
+    ];
+
+    function showPage(page) {
+      Object.keys(pages).forEach((key) => {
+        pages[key].classList.remove("active");
+      });
+
+      pages[page].classList.add("active");
+
+      navLinks.forEach((link) => {
+        link.classList.toggle("active-link", link.dataset.page === page);
+      });
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+
+    navLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        showPage(link.dataset.page);
+      });
+    });
+
+    applyLanguage();
+
+    function openMobileMenu() {
+      document.getElementById("mobileMenu").classList.add("open");
+      document.body.classList.add("no-scroll");
+    }
+
+    function closeMobileMenu() {
+      document.getElementById("mobileMenu").classList.remove("open");
+      document.body.classList.remove("no-scroll");
+    }
+</script>
+
+<!-- 🔥 SOLO UN FIREBASE (SIN DUPLICADOS) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAokhLOy9MTzl66n8DJCtuHdEvsY3BTwa0",
+    authDomain: "sywa-919a4.firebaseapp.com",
+    projectId: "sywa-919a4",
+    storageBucket: "sywa-919a4.firebasestorage.app",
+    messagingSenderId: "804563302070",
+    appId: "1:804563302070:web:2ba86989d753ae9be65817",
+    measurementId: "G-FKZVXL3JGG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.__submitReview = async (data) => {
+    try {
+      await addDoc(collection(db, "reviews"), {
+        ...data,
+        createdAt: serverTimestamp(),
+        source: "index.html"
+      });
+
+      return { success: true };
+    } catch (e) {
+      console.error(e);
+      return { success: false, error: e.message };
+    }
+  };
+</script>
+
+<script>
+  let formData = {
+    nombre: "",
+    servicio: "",
+    valoracion: 0,
+    sugerencia: ""
+  };
+
+  function updateDots(step) {
+    for (let i = 1; i <= 4; i += 1) {
+      const dot = document.getElementById(`dot-${i}`);
+      if (dot) {
+        dot.classList.toggle("done", i <= step);
+      }
+    }
+
+    const counter = document.getElementById("step-counter");
+    if (counter) {
+      counter.textContent = translations[currentLanguage].stepCounter.replace("{step}", step);
+    }
+  }
+
+  function showStep(step) {
+    ["1", "2", "3", "4", "success"].forEach((id) => {
+      const stepEl = document.getElementById(`step-${id}`);
+      if (stepEl) {
+        stepEl.classList.remove("active");
+      }
+    });
+
+    const progress = document.getElementById("progress-dots");
+    const counter = document.getElementById("step-counter");
+
+    if (step === "success") {
+      const successStep = document.getElementById("step-success");
+      if (successStep) successStep.classList.add("active");
+      if (progress) progress.style.display = "none";
+      if (counter) counter.style.display = "none";
+      return;
+    }
+
+    const nextStepEl = document.getElementById(`step-${step}`);
+    if (nextStepEl) nextStepEl.classList.add("active");
+    if (progress) progress.style.display = "flex";
+    if (counter) counter.style.display = "block";
+    updateDots(step);
+  }
+
+  function nextStep(from) {
+    if (from === 1) {
+      const nombre = document.getElementById("input-nombre");
+      if (!nombre || !nombre.value.trim()) {
+        shake("input-nombre");
+        return;
+      }
+      formData.nombre = nombre.value.trim();
+      showStep(2);
+      return;
+    }
+
+    if (from === 2) {
+      if (!formData.servicio) return;
+      showStep(3);
+      return;
+    }
+
+    if (from === 3) {
+      if (!formData.valoracion) return;
+      showStep(4);
+      return;
+    }
+  }
+
+  function prevStep(from) {
+    const previous = from - 1;
+    if (previous >= 1) {
+      showStep(previous);
+    }
+  }
+
+  function shake(id) {
+    const element = document.getElementById(id);
+    if (!element) return;
+    element.style.borderColor = "#ff7070";
+    element.style.animation = "shake .4s ease";
+    setTimeout(() => {
+      element.style.borderColor = "";
+      element.style.animation = "";
+    }, 500);
+  }
+
+  function selectService(button, serviceName) {
+    document.querySelectorAll(".svc-btn").forEach((btn) => btn.classList.remove("selected"));
+    if (button) button.classList.add("selected");
+    formData.servicio = serviceName;
+    const step2Next = document.getElementById("step2Next");
+    if (step2Next) step2Next.disabled = false;
+  }
+
+  function setStar(value) {
+    formData.valoracion = value;
+    document.querySelectorAll("#stars-row .star-btn").forEach((button, index) => {
+      button.textContent = index < value ? "★" : "☆";
+      button.style.color = index < value ? "#6FFF00" : "";
+    });
+
+    const label = document.getElementById("star-label");
+    if (label) {
+      const labels = [
+        "",
+        translations[currentLanguage].starLabels?.[1] || "Muy malo ☹",
+        translations[currentLanguage].starLabels?.[2] || "Malo",
+        translations[currentLanguage].starLabels?.[3] || "Regular 😐",
+        translations[currentLanguage].starLabels?.[4] || "Bueno",
+        translations[currentLanguage].starLabels?.[5] || "Excelente ★"
+      ];
+      label.textContent = labels[value] || translations[currentLanguage].starPlaceholder;
+      label.style.color = "#6FFF00";
+    }
+
+    const step3Next = document.getElementById("step3Next");
+    if (step3Next) step3Next.disabled = false;
+  }
+
+  async function submitForm() {
+    const sugerencia = document.getElementById("input-sugerencia");
+    if (sugerencia) {
+      formData.sugerencia = sugerencia.value.trim();
+    }
+
+    const submitBtn = document.getElementById("submitFinal");
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner"></span> ${translations[currentLanguage].sending}`;
+    }
+
+    const formError = document.getElementById("form-error");
+    if (formError) formError.style.display = "none";
+
+    let tries = 0;
+    while (!window.__submitReview && tries < 25) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      tries += 1;
+    }
+
+    if (!window.__submitReview) {
+      showError(translations[currentLanguage].firebaseUnavailable);
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `${translations[currentLanguage].submitButton} ${icons.send}`;
+      }
+      return;
+    }
+
+    const response = await window.__submitReview({ ...formData });
+    if (response.success) {
+      showStep("success");
+      return;
+    }
+
+    showError(`Error: ${response.error || translations[currentLanguage].errorDefault}`);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `${translations[currentLanguage].submitButton} ${icons.send}`;
+    }
+  }
+
+  function showError(message) {
+    const errorMsg = document.getElementById("error-msg");
+    const formError = document.getElementById("form-error");
+    if (errorMsg) errorMsg.textContent = message;
+    if (formError) formError.style.display = "block";
+  }
+
+  function resetForm() {
+    formData = { nombre: "", servicio: "", valoracion: 0, sugerencia: "" };
+    const nombre = document.getElementById("input-nombre");
+    const sugerencia = document.getElementById("input-sugerencia");
+    const starLabel = document.getElementById("star-label");
+
+    if (nombre) nombre.value = "";
+    if (sugerencia) sugerencia.value = "";
+    if (starLabel) {
+      starLabel.textContent = translations[currentLanguage].starPlaceholder;
+      starLabel.style.color = "";
+    }
+
+    document.querySelectorAll("#stars-row .star-btn").forEach((button) => {
+      button.textContent = "☆";
+      button.style.color = "";
+    });
+
+    document.querySelectorAll(".svc-btn").forEach((button) => button.classList.remove("selected"));
+    const step2Next = document.getElementById("step2Next");
+    const step3Next = document.getElementById("step3Next");
+    if (step2Next) step2Next.disabled = true;
+    if (step3Next) step3Next.disabled = true;
+
+    const formError = document.getElementById("form-error");
+    if (formError) formError.style.display = "none";
+
+    const progress = document.getElementById("progress-dots");
+    const counter = document.getElementById("step-counter");
+    if (progress) progress.style.display = "flex";
+    if (counter) counter.style.display = "block";
+
+    showStep(1);
+  }
+</script>
+
+</body>
+</html>
